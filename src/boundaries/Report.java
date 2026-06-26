@@ -40,7 +40,6 @@ public class Report extends JFrame {
 	}
 
 	public Report() {
-		// 1. Impostazioni Finestra (Ingrandita l'altezza per farci stare la torta)
 		setTitle("Report Statistico del Gruppo");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 580, 560); 
@@ -51,7 +50,6 @@ public class Report extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		// 2. Titolo
 		JLabel lblTitolo = new JLabel("Report Statistico del Gruppo");
 		lblTitolo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTitolo.setForeground(Color.BLACK);
@@ -64,7 +62,6 @@ public class Report extends JFrame {
 		separator.setBounds(30, 55, 500, 2);
 		contentPane.add(separator);
 		
-		// 3. Statistiche Generali
 		JLabel lblStatsTitolo = new JLabel("STATISTICHE GENERALI (Viaggio a Roma)");
 		lblStatsTitolo.setForeground(Color.BLACK);
 		lblStatsTitolo.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -83,13 +80,11 @@ public class Report extends JFrame {
 		lblImporto.setBounds(30, 120, 300, 20);
 		contentPane.add(lblImporto);
 		
-		// 4. VERO GRAFICO A TORTA CON JAVAFX
-		// Creiamo il pannello ponte tra Swing e JavaFX
+
 		JFXPanel fxPanel = new JFXPanel();
-		fxPanel.setBounds(30, 150, 500, 220); // Spazio più grande per il grafico
+		fxPanel.setBounds(30, 150, 500, 220);
 		contentPane.add(fxPanel);
 		
-		// JavaFX ha bisogno di essere avviato nel suo "Thread" (processo) specifico
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -97,7 +92,6 @@ public class Report extends JFrame {
 			}
 		});
 		
-		// 5. Tabella finale (Spostata più in basso per fare spazio al grafico)
 		JTextArea txtTabella = new JTextArea();
 		txtTabella.setEditable(false);
 		txtTabella.setBackground(Color.WHITE); 
@@ -115,25 +109,18 @@ public class Report extends JFrame {
 		contentPane.add(txtTabella);
 	}
 	
-	/**
-	 * Metodo che disegna fisicamente il grafico a torta usando JavaFX.
-	 */
 	private void creaGraficoJavaFX(JFXPanel fxPanel) {
-		// 1. Inseriamo i dati del grafico
 		ObservableList<PieChart.Data> datiTorta = FXCollections.observableArrayList(
 			new PieChart.Data("Spese Comuni (88.9%)", 88.9),
 			new PieChart.Data("Spese Personali (11.1%)", 11.1)
 		);
 		
-		// 2. Creiamo il grafico a torta e gli passiamo i dati
 		PieChart graficoTorta = new PieChart(datiTorta);
 		graficoTorta.setTitle("Ripartizione delle Spese");
-		graficoTorta.setLegendVisible(true); // Mostra la legenda con i colori
+		graficoTorta.setLegendVisible(true); 
 		
-		// 3. Creiamo la scena JavaFX e la agganciamo al pannello ponte di Swing
 		Scene scene = new Scene(new Group(graficoTorta));
 		
-		// Impostiamo le dimensioni del grafico uguali a quelle del pannello (500x220)
 		graficoTorta.setPrefSize(500, 220); 
 		
 		fxPanel.setScene(scene);

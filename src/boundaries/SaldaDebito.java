@@ -33,7 +33,6 @@ public class SaldaDebito extends JFrame {
 	}
 
 	public SaldaDebito() {
-		// 1. Impostazioni Finestra
 		setTitle("Registra Rimborso (Movimento)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 420, 270); 
@@ -44,7 +43,6 @@ public class SaldaDebito extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null); 
 		
-		// 2. Sezione "Seleziona quota debito aperta"
 		JLabel lblSelezionaQuota = new JLabel("Seleziona quota debito aperta:");
 		lblSelezionaQuota.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblSelezionaQuota.setForeground(Color.BLACK); 
@@ -57,7 +55,6 @@ public class SaldaDebito extends JFrame {
 		comboQuota.setBounds(40, 60, 320, 25);
 		contentPane.add(comboQuota);
 		
-		// 3. Sezione "Importo"
 		JLabel lblImporto = new JLabel("Importo (\u20AC):");
 		lblImporto.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblImporto.setForeground(Color.BLACK); 
@@ -65,19 +62,17 @@ public class SaldaDebito extends JFrame {
 		contentPane.add(lblImporto);
 		
 		txtImporto = new JTextField();
-		txtImporto.setText("30.00"); // Questo in futuro lo caricherete dal database
+		txtImporto.setText("30.00"); 
 		
-		// --- LA MODIFICA È QUI ---
-		txtImporto.setEditable(false); // Impedisce di scriverci dentro!
-		txtImporto.setBackground(new Color(240, 240, 240)); // Sfondino grigio chiaro per far capire che è bloccato
-		txtImporto.setForeground(Color.DARK_GRAY); // Testo grigio scuro
+		txtImporto.setEditable(false);
+		txtImporto.setBackground(new Color(240, 240, 240));
+		txtImporto.setForeground(Color.DARK_GRAY); 
 		// -------------------------
 		
 		txtImporto.setBounds(140, 110, 220, 25);
 		contentPane.add(txtImporto);
 		txtImporto.setColumns(10);
 		
-		// 4. Bottone CONFERMA RIMBORSO
 		JButton btnConferma = new JButton("CONFERMA RIMBORSO");
 		btnConferma.setBackground(new Color(35, 60, 40)); 
 		btnConferma.setForeground(Color.WHITE); 

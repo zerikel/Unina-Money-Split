@@ -38,7 +38,6 @@ public class AggiungiUtente extends JFrame {
 
 	public AggiungiUtente() {
 		
-		// 1. Impostazioni Finestra
 		setTitle("Invita Utenti");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 360, 300);
@@ -49,7 +48,6 @@ public class AggiungiUtente extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		// 2. Sezione "Invita Partecipanti"
 		JLabel lblInvita = new JLabel("Invita Partecipanti:");
 		lblInvita.setFont(new Font("Tahoma", Font.BOLD, 12)); 
 		lblInvita.setForeground(Color.BLACK);
@@ -61,7 +59,6 @@ public class AggiungiUtente extends JFrame {
 		contentPane.add(txtInserisciEmail);
 		txtInserisciEmail.setColumns(10);
 		
-		// 3. Bottone "Aggiungi" 
 		JButton btnAggiungi = new JButton("Aggiungi");
 		btnAggiungi.setBackground(new Color(225, 213, 231)); 
 		btnAggiungi.setBorder(new LineBorder(new Color(150, 115, 166), 1, true)); 
@@ -70,7 +67,6 @@ public class AggiungiUtente extends JFrame {
 		btnAggiungi.setBounds(205, 50, 95, 24);
 		contentPane.add(btnAggiungi);
 		
-		// 4. Sezione "Lista invitati temporanea"
 		JLabel lblListaTemp = new JLabel("Lista invitati temporanea:");
 		lblListaTemp.setForeground(Color.BLACK);
 		lblListaTemp.setBounds(30, 95, 180, 20);
@@ -80,9 +76,7 @@ public class AggiungiUtente extends JFrame {
 		txtAreaLista.setBackground(Color.WHITE);
 		txtAreaLista.setForeground(Color.BLACK);
 		
-		// --- MODIFICA 1: Bordo trasparente (EmptyBorder invece di LineBorder) ---
 		txtAreaLista.setBorder(new EmptyBorder(5, 5, 5, 5)); 
-		// ------------------------------------------------------------------------
 		
 		txtAreaLista.setEditable(false);
 		txtAreaLista.setBounds(30, 115, 270, 70);
@@ -119,7 +113,6 @@ public class AggiungiUtente extends JFrame {
 			}
 		});
 		
-		// 5. Bottone Principale Finale
 		JButton btnConfermaInviti = new JButton("CONFERMA INVITI");
 		btnConfermaInviti.setForeground(Color.BLACK);
 		btnConfermaInviti.setFont(new Font("Arial", Font.BOLD, 12));
@@ -132,23 +125,18 @@ public class AggiungiUtente extends JFrame {
 		btnConfermaInviti.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				// --- MODIFICA 2: Controllo lista vuota ---
 				String listaUtenti = txtAreaLista.getText().trim();
 				
 				if (listaUtenti.isEmpty()) {
-					// Se la lista è vuota, blocca tutto e mostra l'errore
 					JOptionPane.showMessageDialog(
 							AggiungiUtente.this, 
 							"Errore: non hai aggiunto nessun utente alla lista degli inviti!", 
 							"Nessun utente inserito", 
 							JOptionPane.ERROR_MESSAGE
 						);
-					return; // Esce e non salva
+					return; 
 				}
-				// ------------------------------------------
 				
-				// Se arriva qui, vuol dire che c'è almeno un'email. 
-				// Qui farai l'INSERT nella tabella INVITO
 				JOptionPane.showMessageDialog(
 						AggiungiUtente.this, 
 						"Tutti gli inviti sono stati inviati con successo!", 
@@ -156,7 +144,6 @@ public class AggiungiUtente extends JFrame {
 						JOptionPane.INFORMATION_MESSAGE
 					);
 				
-				// (Opzionale) Svuota la lista dopo aver salvato
 				txtAreaLista.setText("");
 			}
 		});

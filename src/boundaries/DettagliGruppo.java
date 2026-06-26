@@ -35,7 +35,6 @@ public class DettagliGruppo extends JFrame {
 	}
 
 	public DettagliGruppo() {
-		// 1. Impostazioni Finestra Principale
 		setTitle("DETTAGLI GRUPPO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 600, 450);
@@ -44,21 +43,15 @@ public class DettagliGruppo extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		// 2. Creazione del JTabbedPane (Il gestore delle schede)
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(10, 10, 564, 390);
-		// Font un po' più grande per le linguette in alto
 		tabbedPane.setFont(new Font("Tahoma", Font.BOLD, 12)); 
 		contentPane.add(tabbedPane);
 
-		/* =========================================================
-		 * TAB 1: STORICO SPESE (Prima Immagine)
-		 * ========================================================= */
 		JPanel panelSpese = new JPanel();
 		panelSpese.setLayout(null);
 		tabbedPane.addTab("STORICO SPESE", null, panelSpese, null);
 
-		// Area di testo per simulare la tabella delle spese
 		JTextArea txtSpese = new JTextArea();
 		txtSpese.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		txtSpese.setEditable(false);
@@ -72,7 +65,6 @@ public class DettagliGruppo extends JFrame {
 		scrollSpese.setBounds(20, 20, 520, 200);
 		panelSpese.add(scrollSpese);
 
-		// Bottone "+ INSERISCI SPESA" (Azzurro)
 		JButton btnInserisciSpesa = new JButton("+ INSERISCI SPESA");
 		btnInserisciSpesa.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnInserisciSpesa.setBackground(new Color(218, 232, 252));
@@ -82,7 +74,6 @@ public class DettagliGruppo extends JFrame {
 		btnInserisciSpesa.setBounds(20, 280, 160, 40);
 		panelSpese.add(btnInserisciSpesa);
 
-		// Bottone "VEDI REPORT" (Viola)
 		JButton btnVediReport = new JButton("VEDI REPORT");
 		btnVediReport.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnVediReport.setBackground(new Color(225, 213, 231));
@@ -93,26 +84,21 @@ public class DettagliGruppo extends JFrame {
 		panelSpese.add(btnVediReport);
 
 		
-		/* =========================================================
-		 * TAB 2: SALDI E RIMBORSI (Seconda Immagine)
-		 * ========================================================= */
 		JPanel panelSaldi = new JPanel();
 		panelSaldi.setLayout(null);
 		tabbedPane.addTab("SALDI E RIMBORSI", null, panelSaldi, null);
 
-		// Saldo Paolo (Credito - Verde)
 		JLabel lblPaolo = new JLabel("• Paolo Augusto (Tu):");
 		lblPaolo.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblPaolo.setBounds(30, 40, 200, 25);
 		panelSaldi.add(lblPaolo);
 
 		JLabel lblCredito = new JLabel("+ 20.00 € (Credito)");
-		lblCredito.setForeground(new Color(34, 139, 34)); // Verde Scuro
+		lblCredito.setForeground(new Color(34, 139, 34));
 		lblCredito.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblCredito.setBounds(250, 40, 200, 25);
 		panelSaldi.add(lblCredito);
 
-		// Saldo Nicola (Debito - Rosso)
 		JLabel lblNicola = new JLabel("• Nicola Barricelli:");
 		lblNicola.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblNicola.setBounds(30, 90, 200, 25);
@@ -124,7 +110,6 @@ public class DettagliGruppo extends JFrame {
 		lblDebito.setBounds(250, 90, 200, 25);
 		panelSaldi.add(lblDebito);
 
-		// Bottone "EFFETTUA UN RIMBORSO" (Verde)
 		JButton btnRimborso = new JButton("EFFETTUA UN RIMBORSO");
 		btnRimborso.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnRimborso.setBackground(new Color(213, 232, 212));
