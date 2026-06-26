@@ -6,9 +6,11 @@ public class Gruppo {
 	private String nome;
 	private Date dataCreazione;
 	private Utente CreatoreGruppo;
+	private int idGruppo;
 	private ArrayList<Partecipazione> membriGruppo = new ArrayList<Partecipazione>();
 	
-	public Gruppo (String nome, Date dataCreazione, Utente CreatoreGruppo) {
+	public Gruppo (int idGruppo ,String nome, Date dataCreazione, Utente CreatoreGruppo) {
+		this.idGruppo = idGruppo;
 		if(nome != null)
 		this.nome = nome;
 		else
@@ -24,6 +26,46 @@ public class Gruppo {
 		
 			Partecipazione Creatore = new Partecipazione(CreatoreGruppo, this);
 			membriGruppo.add(Creatore);
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public Date getDataCreazione() {
+		return dataCreazione;
+	}
+
+	public void setDataCreazione(Date dataCreazione) {
+		this.dataCreazione = dataCreazione;
+	}
+
+	public Utente getCreatoreGruppo() {
+		return CreatoreGruppo;
+	}
+
+	public void setCreatoreGruppo(Utente creatoreGruppo) {
+		CreatoreGruppo = creatoreGruppo;
+	}
+
+	public ArrayList<Partecipazione> getMembriGruppo() {
+		return membriGruppo;
+	}
+
+	public void setMembriGruppo(ArrayList<Partecipazione> membriGruppo) {
+		this.membriGruppo = membriGruppo;
+	}
+
+	public int getIdGruppo() {
+		return idGruppo;
+	}
+
+	public void setIdGruppo(int idGruppo) {
+		this.idGruppo = idGruppo;
 	}
 
 }

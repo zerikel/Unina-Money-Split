@@ -22,6 +22,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.border.LineBorder;
 import java.awt.Cursor;
+import java.util.*;
+import control.*;
+import Entities.*;
 
 public class Dashboard extends JFrame {
 
@@ -62,20 +65,15 @@ public class Dashboard extends JFrame {
 		contentPane.add(scrollPane);
 		
 		JList<String> list = new JList<>();
-		list.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-			}
-		});
 		scrollPane.setViewportView(list);
 		
-		String[] gruppiFinti = {"Viaggio a Roma", "Regalo Laurea Nicola", "Coinquilini Via Claudio"};
-
 		DefaultListModel<String> modelloGruppi = new DefaultListModel<>();
-
-		for(String gruppo : gruppiFinti) {
-			modelloGruppi.addElement(gruppo);
+		
+		List<Gruppo> gruppiReali = MainController.getInstance().getGruppiUtente();
+		
+		for(Gruppo gruppo : gruppiReali) {
+			modelloGruppi.addElement(gruppo.getNome()); // Richiede il metodo getNome() in Gruppo
 		}
-
 		list.setModel(modelloGruppi);
 		
 		JLabel lblNewLabel = new JLabel("I TUOI GRUPPI ATTIVI");
@@ -91,20 +89,20 @@ public class Dashboard extends JFrame {
 		JPanel panel = new JPanel();
 		panel.setBounds(324, 98, 227, 161); 
 		contentPane.add(panel);
-		
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		
-		String[] invitiFinti = {"Spese Studio (da nicola@...)", "Cena di classe (da paolo@...)"};
+		List<Invito> invitiReali = MainController.getInstance().getInvitiUtente();
 
 		panel.removeAll();
-
-		for (String testoInvito : invitiFinti) {
+		for (Invito invito : invitiReali) {
+			String nomeGruppoInvito = invito.getInvitoGruppo().getNome();
+			String testoInvito = "Invito per: " + nomeGruppoInvito;
+			
+			int idGruppo = invito.getInvitoGruppo().getIdGruppo();
 			
 			JPanel pannelloSingoloInvito = new JPanel();
 			pannelloSingoloInvito.setLayout(new BorderLayout(0, 5)); 
-			
 			pannelloSingoloInvito.setBorder(new EmptyBorder(0, 0, 15, 0));
-			
 			pannelloSingoloInvito.setMaximumSize(new Dimension(Integer.MAX_VALUE, 65));
 			
 			JLabel lblTesto = new JLabel(testoInvito);
@@ -116,15 +114,31 @@ public class Dashboard extends JFrame {
 			pannelloBottoni.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 0));
 			
 			JButton btnAccetta = new JButton("Accetta");
-			btnAccetta.setBackground(new Color(200, 230, 201)); // Verde finto
+			btnAccetta.setBackground(new Color(200, 230, 201)); 
 			btnAccetta.addActionListener(e -> {
-				System.out.println("Hai accettato: " + testoInvito);
+				boolean successo = MainController.getInstance().gestisciRispostaInvito(idGruppo, true);
+				
+				if (successo)
+				{
+					javax.swing.JOptionPane.showMessageDialog(Dashboard.this,"Sei entrato in "+ nomeGruppoInvito + "!");
+					dispose();
+					new Dashboard().setVisible(true);
+				}
 			});
 			
 			JButton btnRifiuta = new JButton("Rifiuta");
-			btnRifiuta.setBackground(new Color(255, 205, 210)); // Rosso finto
+			btnRifiuta.setBackground(new Color(255, 205, 210)); 
 			btnRifiuta.addActionListener(e -> {
-				 System.out.println("Hai rifiutato: " + testoInvito);
+				 System.out.println("Hai rifiutato: " + nomeGruppoInvito);
+				 
+				 boolean successo = MainController.getInstance().gestisciRispostaInvito(idGruppo, false);
+				 
+				 if (successo)
+				 {
+					 javax.swing.JOptionPane.showMessageDialog(Dashboard.this,"Hai rifiutato l''invito ad entrare al gruppo "+ nomeGruppoInvito);
+					 dispose();
+					 new Dashboard().setVisible(true);
+				 }
 			});
 			
 			pannelloBottoni.add(btnAccetta);
