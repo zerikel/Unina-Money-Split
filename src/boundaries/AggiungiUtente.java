@@ -6,6 +6,8 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -39,7 +41,7 @@ public class AggiungiUtente extends JFrame {
 	public AggiungiUtente() {
 		
 		setTitle("Invita Utenti");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 360, 300);
 		
 		contentPane = new JPanel();
@@ -125,26 +127,29 @@ public class AggiungiUtente extends JFrame {
 		btnConfermaInviti.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				String listaUtenti = txtAreaLista.getText().trim();
+				String[] linee = txtAreaLista.getText().split("\n");
+		        List<String> listaEmail = new ArrayList<>();
+		        
+		        for (String linea : linee) {
+		            if (linea.startsWith("- ")) {
+		                listaEmail.add(linea.substring(2).trim());
+		            }
+		        }
+		        
+		        
+		        if (listaEmail.isEmpty()) {
+		            JOptionPane.showMessageDialog(AggiungiUtente.this, "Nessun utente aggiunto!");
+		            return; 
+		        }
 				
-				if (listaUtenti.isEmpty()) {
-					JOptionPane.showMessageDialog(
-							AggiungiUtente.this, 
-							"Errore: non hai aggiunto nessun utente alla lista degli inviti!", 
-							"Nessun utente inserito", 
-							JOptionPane.ERROR_MESSAGE
-						);
-					return; 
-				}
-				
-				JOptionPane.showMessageDialog(
-						AggiungiUtente.this, 
-						"Tutti gli inviti sono stati inviati con successo!", 
-						"Fatto", 
-						JOptionPane.INFORMATION_MESSAGE
-					);
-				
-				txtAreaLista.setText("");
+		        boolean successo = control.MainController.getInstance().inviaInviti(listaEmail);
+		        
+		        if (successo) {
+		            JOptionPane.showMessageDialog(AggiungiUtente.this, "Inviti inviati con successo!");
+		            dispose();
+		        } else {
+		            JOptionPane.showMessageDialog(AggiungiUtente.this, "Errore durante l'invio.");
+		        }
 			}
 		});
 		contentPane.add(btnConfermaInviti);

@@ -17,16 +17,14 @@ import Entities.Partecipazione;
 public class DettagliGruppo extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
-    private Gruppo gruppoAttuale;
-    
+    private JPanel contentPane;    
     private JTextArea txtSpese;
     private JPanel panelSaldi;
 
-    public DettagliGruppo(Gruppo gruppo) {
-        this.gruppoAttuale = gruppo;
+    public DettagliGruppo() {
         
-        setTitle("DETTAGLI GRUPPO: " + gruppo.getNome().toUpperCase());
+    	String nomeGruppo = MainController.getInstance().getNomeGruppoAttuale();
+        setTitle("DETTAGLI GRUPPO: " + nomeGruppo.toUpperCase());
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
         setBounds(100, 100, 600, 450);
         contentPane = new JPanel();
@@ -60,7 +58,7 @@ public class DettagliGruppo extends JFrame {
         panelSpese.add(btnInserisciSpesa);
         
         btnInserisciSpesa.addActionListener(e -> {
-            AggiungiSpesa dialog = new AggiungiSpesa(this, gruppoAttuale);
+            AggiungiSpesa dialog = new AggiungiSpesa(this);
             dialog.setVisible(true);
             aggiornaDati();
         });
@@ -79,9 +77,9 @@ public class DettagliGruppo extends JFrame {
         tabbedPane.addTab("SALDI E RIMBORSI", null, panelSaldi, null);
         aggiornaDati();
     }
-    
+   
     public void aggiornaDati() {
-        List<Spesa> storico = MainController.getInstance().getSpeseGruppo(gruppoAttuale);
+        List<Spesa> storico = MainController.getInstance().getSpeseGruppo();
         StringBuilder sb = new StringBuilder();
         sb.append("Data       | Descrizione    | Pagato Da | Importo  | Tipo Spesa\n");
         sb.append("-------------------------------------------------------------------\n");
@@ -93,7 +91,7 @@ public class DettagliGruppo extends JFrame {
         }
         txtSpese.setText(sb.toString());
 
-        List<Partecipazione> saldi = MainController.getInstance().getSaldiGruppo(gruppoAttuale);
+        List<Partecipazione> saldi = MainController.getInstance().getSaldiGruppo();
         String emailUtenteLoggato = MainController.getInstance().getUtenteLoggato().getEmail();
         
         panelSaldi.removeAll(); 

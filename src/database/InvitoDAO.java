@@ -73,4 +73,34 @@ public class InvitoDAO {
 		}
 	return successo;
 	}
+	
+	public void inviaInvito(String emailInvitato, int idGruppo) {
+	    Connection conn = DBConnection.getConnection();
+	    String query = "INSERT INTO invito (emailutente, idgruppo, statoinvito) VALUES (?, ?, 'InAttesa')";
+	    
+	    try {
+	        PreparedStatement pstmt = conn.prepareStatement(query);
+	        pstmt.setString(1, emailInvitato);
+	        pstmt.setInt(2, idGruppo);
+	        pstmt.executeUpdate();
+	        System.out.println("Invito inviato con successo a: " + emailInvitato);
+	    } catch (SQLException e) {
+	        System.err.println("ERRORE SQL durante l'invio dell'invito a " + emailInvitato);
+	        e.printStackTrace(); 
+	    }
+	}
+	
+	public boolean esisteInvito(String email, int idGruppo) {
+	    Connection conn = DBConnection.getConnection();
+	    String query = "SELECT 1 FROM INVITO WHERE emailutente = ? AND idgruppo = ?";
+	    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+	        pstmt.setString(1, email);
+	        pstmt.setInt(2, idGruppo);
+	        ResultSet rs = pstmt.executeQuery();
+	        return rs.next(); // ritornerà true se trova almeno un elemento nel risultato indipendetemente dallo stato
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return false;
+	}
 }

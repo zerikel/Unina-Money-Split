@@ -26,11 +26,9 @@ public class AggiungiSpesa extends JDialog {
     private JPanel contentPane;
     private JTextField txtDescrizione;
     private JTextField txtImporto;
-    private Gruppo gruppoAttuale;
 
-    public AggiungiSpesa(JFrame parentFrame, Gruppo gruppoAttuale) {
+    public AggiungiSpesa(JFrame parentFrame) {
         super(parentFrame, "Registra Nuova Spesa", true); 
-        this.gruppoAttuale = gruppoAttuale;
         
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setBounds(100, 100, 400, 310);
@@ -121,8 +119,7 @@ public class AggiungiSpesa extends JDialog {
                             importoNum, 
                             descrizione, 
                             LocalDate.now(), 
-                            tipoSelezionato, 
-                            gruppoAttuale
+                            tipoSelezionato
                     );
                     
                     if (salvato) {

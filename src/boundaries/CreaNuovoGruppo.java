@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JFrame;
@@ -15,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 public class CreaNuovoGruppo extends JFrame {
 
@@ -22,25 +25,13 @@ public class CreaNuovoGruppo extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtNomeGruppo;
 	private JTextField txtInserisciEmail;
-
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					CreaNuovoGruppo frame = new CreaNuovoGruppo();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+	
+	private List<String> emailInvitati = new ArrayList<>();
 
 	public CreaNuovoGruppo() {
 		
 		setTitle("Finestra: Crea Nuovo Gruppo");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
 		setBounds(100, 100, 360, 360);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -90,29 +81,19 @@ public class CreaNuovoGruppo extends JFrame {
 		        String email = txtInserisciEmail.getText().trim();
 		        
 		        if (email.isEmpty() || email.equals("Inserisci un'email per aggiungere...")) {
-		            javax.swing.JOptionPane.showMessageDialog(
-		                CreaNuovoGruppo.this, 
-		                "Il campo email è vuoto!", 
-		                "Attenzione", 
-		                javax.swing.JOptionPane.WARNING_MESSAGE
-		            );
+		            JOptionPane.showMessageDialog(CreaNuovoGruppo.this, "Il campo email è vuoto!", "Attenzione", JOptionPane.WARNING_MESSAGE);
 		            return; 
 		        }
 		        
-		     String emailRegex = "^[A-Za-z0-9+_.-]+@(studenti\\.unina\\.it|[A-Za-z0-9.-]+\\.(com|it))$";		        
+		        String emailRegex = "^[A-Za-z0-9+_.-]+@(studenti\\.unina\\.it|[A-Za-z0-9.-]+\\.(com|it))$";		        
 		        if (!email.matches(emailRegex)) {
-		            javax.swing.JOptionPane.showMessageDialog(
-		                CreaNuovoGruppo.this, 
-		                "Formato email non valido. Assicurati di usare la @ e un dominio corretto.", 
-		                "Errore di Formato", 
-		                javax.swing.JOptionPane.ERROR_MESSAGE
-		            );
+		            JOptionPane.showMessageDialog(CreaNuovoGruppo.this, "Formato email non valido.", "Errore", JOptionPane.ERROR_MESSAGE);
 		            return;
 		        }
 		        
+		        emailInvitati.add(email);
 		        txtAreaLista.append("- " + email + "\n");
 		        txtInserisciEmail.setText(""); 
-		        
 		        contentPane.requestFocus();
 		    }
 		});
@@ -128,7 +109,23 @@ public class CreaNuovoGruppo extends JFrame {
 		
 		btnCreaGruppo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Gruppo Creato!");
+				String nomeGruppo = txtNomeGruppo.getText().trim();
+				if (nomeGruppo.isEmpty()) {
+					JOptionPane.showMessageDialog(CreaNuovoGruppo.this, "Inserisci il nome del gruppo!");
+					return;
+				}
+				
+				boolean successo = control.MainController.getInstance().creaGruppo(nomeGruppo, emailInvitati);
+				
+				if (successo) {
+					JOptionPane.showMessageDialog(CreaNuovoGruppo.this, "Gruppo creato con successo!");
+					dispose();
+					new Dashboard().setVisible(true);
+				} else {
+					JOptionPane.showMessageDialog(CreaNuovoGruppo.this, "Creazione fallita! Assicurati che tutti gli invitati siano registrati e che nessuno sia già nel gruppo.", 
+			                "Errore di Validazione", 
+			                JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		contentPane.add(btnCreaGruppo);

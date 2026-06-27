@@ -26,6 +26,8 @@ import java.util.*;
 import control.MainController;
 import Entities.Gruppo;
 import Entities.Invito;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Dashboard extends JFrame {
 
@@ -49,21 +51,27 @@ public class Dashboard extends JFrame {
         scrollPane.setViewportView(list);
         
         DefaultListModel<String> modelloGruppi = new DefaultListModel<>();
-        List<Gruppo> gruppiReali = MainController.getInstance().getGruppiUtente();
+        List<String> nomiGruppi = MainController.getInstance().getNomiGruppiUtente();
         
-        for(Gruppo gruppo : gruppiReali) {
-            modelloGruppi.addElement(gruppo.getNome()); 
+        for(String nome : nomiGruppi) {
+            modelloGruppi.addElement(nome); 
         }
         list.setModel(modelloGruppi);
         
         list.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
-                if (evt.getClickCount() == 1) { // Doppio click
+            	if (evt.getClickCount() == 1) {
                     int index = list.locationToIndex(evt.getPoint());
                     if (index >= 0) {
-                        Gruppo gruppoSelezionato = gruppiReali.get(index);
-    
-                        DettagliGruppo dettagliFrame = new DettagliGruppo(gruppoSelezionato);
+                    	MainController.getInstance().impostaGruppoDaIndice(index);                    	
+                    }
+            	}
+            	if (evt.getClickCount() == 2) {
+                    int index = list.locationToIndex(evt.getPoint());
+                    if (index >= 0) {
+                    	MainController.getInstance().impostaGruppoDaIndice(index);
+                    	
+                        DettagliGruppo dettagliFrame = new DettagliGruppo();
                         dettagliFrame.setVisible(true);
                     }
                 }
@@ -136,6 +144,12 @@ public class Dashboard extends JFrame {
         panel.add(Box.createVerticalGlue());
         
         JButton btnCreaGruppo = new JButton("CREA NUOVO GRUPPO");
+        btnCreaGruppo.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		CreaNuovoGruppo finestraCrea = new CreaNuovoGruppo();
+        		finestraCrea.setVisible(true);
+        	}
+        });
         btnCreaGruppo.setForeground(Color.BLACK);
         btnCreaGruppo.setFont(new Font("Arial", Font.BOLD, 12));
         btnCreaGruppo.setFocusPainted(false);
@@ -146,6 +160,17 @@ public class Dashboard extends JFrame {
         contentPane.add(btnCreaGruppo);
         
         JButton btnAggiungiUtente = new JButton("AGGIUNGI UTENTE");
+        btnAggiungiUtente.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if (MainController.getInstance().getNomeGruppoAttuale().isEmpty()) {
+                    javax.swing.JOptionPane.showMessageDialog(Dashboard.this, "Seleziona prima un gruppo dalla lista!");
+                    return;
+                }
+        		
+        		AggiungiUtente finestraInvito = new AggiungiUtente();
+                finestraInvito.setVisible(true);
+        	}
+        });
         btnAggiungiUtente.setForeground(Color.BLACK);
         btnAggiungiUtente.setFont(new Font("Arial", Font.BOLD, 12));
         btnAggiungiUtente.setFocusPainted(false);
