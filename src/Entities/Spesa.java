@@ -18,4 +18,10 @@ public abstract class Spesa {
 		this.pagatore = pagatore;
 		this.SGruppo = SGruppo;
 	}
+	
+	public float getImportoTotale() { return importoTotale; }
+    public String getDescrizione() { return descrizione; }
+    public LocalDate getData() { return data; }
+    public Gruppo getSGruppo() { return SGruppo; }
+    public Partecipazione getPagatore() { return pagatore; }
 }

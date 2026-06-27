@@ -23,9 +23,6 @@ public class CreaNuovoGruppo extends JFrame {
 	private JTextField txtNomeGruppo;
 	private JTextField txtInserisciEmail;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -39,9 +36,7 @@ public class CreaNuovoGruppo extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
+
 	public CreaNuovoGruppo() {
 		
 		setTitle("Finestra: Crea Nuovo Gruppo");

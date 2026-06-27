@@ -51,4 +51,10 @@ public class Partecipazione {
 		
 		return this.saldoCorrente = sommaCredito - sommaDebito;
 	}
+	
+	public float getSaldoCorrente() { return this.saldoCorrente; }
+    public Utente getMyUtente() { return this.myUtente; }
+    public Gruppo getMyGruppo() { return this.myGruppo; }
+	
+	
 }
