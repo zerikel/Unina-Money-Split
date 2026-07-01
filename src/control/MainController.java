@@ -2,6 +2,7 @@ package control;
 
 import database.GruppoDAO;
 import database.InvitoDAO;
+import database.SaldaDebitoDAO;
 import database.UtenteDAO;
 import database.GruppoDettagliDAO;
 import database.SpesaDAO;          
@@ -13,11 +14,13 @@ import java.util.List;
 import Entities.Gruppo;
 import Entities.Invito;
 import Entities.Partecipazione;
+import Entities.Quota;
 import Entities.Spesa;
 import Entities.SpesaComune;
 import Entities.SpesaPersonale;
 import Entities.Utente;
 import boundaries.Dashboard;
+import java.time.format.DateTimeFormatter;
 
 public class MainController {
     
@@ -30,6 +33,7 @@ public class MainController {
     private GruppoDettagliDAO gruppoDettagliDAO;
     private SpesaDAO spesaDAO;
     private Gruppo gruppoAttuale;
+    private SaldaDebitoDAO saldaDebitoDAO;
     
     private MainController() {
         this.utenteDAO = new UtenteDAO();
@@ -180,7 +184,7 @@ public class MainController {
     	{
     		if (utenteDAO.getUtenteByEmail(email) == null) {
                 System.out.println("Salto: " + email + " non è registrato.");
-                continue; //va al prossimo ciclo
+                continue;
             }
     		
     		if (gruppoDAO.isUtentePartecipante(email, idGruppo)) {
@@ -216,5 +220,111 @@ public class MainController {
     	{
     		this.gruppoAttuale = tuttiGruppi.get(index);
     	}
+    }
+    
+    public List<String> getQuoteAperteTesto() {
+        List<Quota> quote = saldaDebitoDAO.getQuoteAperte(this.utenteLoggato.getEmail(), this.gruppoAttuale);
+        List<String> testiUI = new ArrayList<>();
+        
+        DateTimeFormatter formatterData = DateTimeFormatter.ofPattern("dd/MM");
+        
+        for (Quota q : quote) {
+            String dataFormattata = q.getSpesaRiferimento().getData().format(formatterData);
+            String importoFormattato = String.format("%.2f", q.getImporto()).replace(",", "."); 
+            String nomeCreditore = q.getSpesaRiferimento().getPagatore().getMyUtente().getNome();
+            String descrizione = q.getSpesaRiferimento().getDescrizione();
+            
+            testiUI.add(dataFormattata + " - Quota di " + importoFormattato + "€ a " + nomeCreditore + " per " + descrizione);
+        }
+        return testiUI;
+    }
+
+    public float getImportoQuota(int index) {
+        List<Quota> quote = saldaDebitoDAO.getQuoteAperte(this.utenteLoggato.getEmail(), this.gruppoAttuale);
+        if (index >= 0 && index < quote.size()) {
+            return quote.get(index).getImporto();
+        }
+        return 0;
+    }
+
+
+    public boolean registraRimborso(int indexSelezionato, float importoPagato) {
+        List<Quota> quote = saldaDebitoDAO.getQuoteAperte(this.utenteLoggato.getEmail(), this.gruppoAttuale);
+        if (indexSelezionato < 0 || indexSelezionato >= quote.size()) return false;
+        
+        Quota quotaDaSaldare = quote.get(indexSelezionato);
+        
+        int idSpesa = quotaDaSaldare.getSpesaRiferimento().getIdSpesa(); 
+        String emailCreditore = quotaDaSaldare.getSpesaRiferimento().getPagatore().getMyUtente().getEmail();
+        
+        return saldaDebitoDAO.salvaRimborso(idSpesa, this.utenteLoggato.getEmail(), importoPagato, emailCreditore, this.gruppoAttuale.getIdGruppo());
+    }
+    public int getReportNumeroSpese() {
+        if (this.gruppoAttuale == null) return 0;
+        return gruppoDettagliDAO.getSpeseByGruppo(this.gruppoAttuale).size();
+    }
+
+    public float getReportImportoTotale() {
+        if (this.gruppoAttuale == null) return 0f;
+        List<Spesa> spese = gruppoDettagliDAO.getSpeseByGruppo(this.gruppoAttuale);
+        float totale = 0;
+        for (Spesa s : spese) {
+            totale += s.getImportoTotale();
+        }
+        return totale;
+    }
+
+    public double[] getReportPercentualiSpesa() {
+        if (this.gruppoAttuale == null) return new double[]{0.0, 0.0};
+        List<Spesa> spese = gruppoDettagliDAO.getSpeseByGruppo(this.gruppoAttuale);
+        if (spese.isEmpty()) return new double[]{0.0, 0.0};
+
+        float totale = 0;
+        float totaleComuni = 0;
+        for (Spesa s : spese) {
+            totale += s.getImportoTotale();
+            if (s instanceof SpesaComune) {
+                totaleComuni += s.getImportoTotale();
+            }
+        }
+        
+        if (totale == 0) return new double[]{0.0, 0.0};
+        
+        double percComuni = (totaleComuni / totale) * 100.0;
+        double percPersonali = 100.0 - percComuni;
+        return new double[]{percComuni, percPersonali};
+    }
+
+    public String getReportTabellaTesto() {
+        if (this.gruppoAttuale == null) return "";
+        
+        List<Partecipazione> saldi = gruppoDettagliDAO.getPartecipazioniByGruppo(this.gruppoAttuale);
+        List<Spesa> spese = gruppoDettagliDAO.getSpeseByGruppo(this.gruppoAttuale);
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%-15s | %-14s | %s\n", "Partecipante", "Importo Speso", "Saldo Finale Corrente"));
+        sb.append("-----------------------------------------------------------------\n");
+        
+        for (Partecipazione p : saldi) {
+            String nome = p.getMyUtente().getNome();
+            String email = p.getMyUtente().getEmail();
+            
+            float speso = 0;
+            for (Spesa s : spese) {
+                if (s.getPagatore().getMyUtente().getEmail().equals(email)) {
+                    speso += s.getImportoTotale();
+                }
+            }
+            
+            float saldo = p.calcolaSaldoCorrente();
+            String saldoStr;
+            if (saldo > 0) saldoStr = String.format("+ %.2f € (Credito)", saldo);
+            else if (saldo < 0) saldoStr = String.format("%.2f € (Debito)", saldo);
+            else saldoStr = "0.00 € (Pari)";
+            
+            sb.append(String.format("%-15s | %6.2f €       | %s\n", nome, speso, saldoStr));
+        }
+        
+        return sb.toString();
     }
 }

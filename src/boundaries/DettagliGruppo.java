@@ -70,6 +70,12 @@ public class DettagliGruppo extends JFrame {
         btnVediReport.setFocusPainted(false);
         btnVediReport.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnVediReport.setBounds(380, 280, 160, 40);
+        
+        btnVediReport.addActionListener(e -> {
+            Report finestraReport = new Report();
+            finestraReport.setVisible(true);
+        });
+        
         panelSpese.add(btnVediReport);
 
         panelSaldi = new JPanel();
@@ -132,8 +138,16 @@ public class DettagliGruppo extends JFrame {
         btnRimborso.setFocusPainted(false);
         btnRimborso.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnRimborso.setBounds(30, 280, 200, 40);
+        
+        btnRimborso.addActionListener(e -> {
+            SaldaDebito dialog = new SaldaDebito(this);
+            dialog.setVisible(true); 
+            
+            aggiornaDati();
+        });
+
         panelSaldi.add(btnRimborso);
         panelSaldi.revalidate();
         panelSaldi.repaint();
     }
-}
+    }
