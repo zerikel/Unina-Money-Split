@@ -16,7 +16,7 @@ public class GruppoDettagliDAO {
         
         Connection conn = DBConnection.getConnection();
         
-        String query = "SELECT S.ImportoTotale, S.Descrizione, S.Data, S.TipoSpesa, " +
+        String query = "SELECT S.idspesa, S.ImportoTotale, S.Descrizione, S.Data, S.TipoSpesa, " +
                        "U.Email, U.Nome, U.Cognome " +
                        "FROM SPESA S " +
                        "JOIN UTENTE U ON S.EmailPagatore = U.Email " +
@@ -44,9 +44,9 @@ public class GruppoDettagliDAO {
                     
                     Spesa s;
                     if ("COMUNE".equalsIgnoreCase(tipoSpesa)) {
-                        s = new SpesaComune(importo, descrizione, data, gruppo, pagatore);
+                        s = new SpesaComune(rs.getInt("idspesa"),importo, descrizione, data, gruppo, pagatore);
                     } else {
-                        s = new SpesaPersonale(importo, descrizione, data, gruppo, pagatore);
+                        s = new SpesaPersonale(rs.getInt("idspesa"),importo, descrizione, data, gruppo, pagatore);
                     }
                     
                     spese.add(s);

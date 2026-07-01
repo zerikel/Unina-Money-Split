@@ -9,6 +9,7 @@ import database.SpesaDAO;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import Entities.Gruppo;
@@ -40,7 +41,8 @@ public class MainController {
         this.gruppoDAO = new GruppoDAO();
         this.invitoDAO = new InvitoDAO();
         this.gruppoDettagliDAO = new GruppoDettagliDAO(); 
-        this.spesaDAO = new SpesaDAO(); 
+        this.spesaDAO = new SpesaDAO();
+        this.saldaDebitoDAO = new SaldaDebitoDAO();
     }
     
     public static MainController getInstance() {
@@ -100,20 +102,17 @@ public class MainController {
         return gruppoDettagliDAO.getSpeseByGruppo(this.gruppoAttuale);
     }
 
-    public boolean registraSpesa(float importo, String descrizione, LocalDate data, String tipoSpesa) {
+    public boolean registraSpesa(float importo, String descrizione, java.time.LocalDate data, String tipoSpesa) {
         if (this.utenteLoggato == null || this.gruppoAttuale == null) { 
             return false; 
         }
         Partecipazione pagatore = new Partecipazione(this.utenteLoggato, this.gruppoAttuale);
         
-        Spesa nuovaSpesa;
-        if ("COMUNE".equals(tipoSpesa)) {
-            nuovaSpesa = new SpesaComune(importo, descrizione, data, this.gruppoAttuale, pagatore);
-        } else {
-            nuovaSpesa = new SpesaPersonale(importo, descrizione, data, this.gruppoAttuale, pagatore);
-        }
+        String emailPagatore = this.utenteLoggato.getEmail();
+        int idGruppo = this.gruppoAttuale.getIdGruppo();
 
-        return spesaDAO.inserisciSpesa(nuovaSpesa);
+        java.sql.Date dataSQL = java.sql.Date.valueOf(data);
+        return spesaDAO.inserisciSpesa(importo,descrizione,dataSQL,emailPagatore,idGruppo,tipoSpesa);
     }
     
     /*public void impostaGruppoAttuale (int idGruppoSelezionato)

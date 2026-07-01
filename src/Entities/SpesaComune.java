@@ -6,9 +6,9 @@ import java.util.ArrayList;
 public class SpesaComune extends Spesa{
 	private ArrayList<Quota> listaQuote;
 	
-	public SpesaComune (float importoTotale,String descrizione, LocalDate data, Gruppo SGruppo, Partecipazione pagatore)
+	public SpesaComune (int idSpesa,float importoTotale,String descrizione, LocalDate data, Gruppo SGruppo, Partecipazione pagatore)
 	{
-		super (importoTotale,descrizione, data, SGruppo, pagatore);
+		super (idSpesa, importoTotale,descrizione, data, SGruppo, pagatore);
 		listaQuote = new ArrayList<>();
 	}
 }

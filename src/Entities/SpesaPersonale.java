@@ -4,8 +4,8 @@ import java.time.LocalDate;
 
 public class SpesaPersonale extends Spesa{
 	
-	public SpesaPersonale (float importoTotale,String descrizione, LocalDate data, Gruppo SGruppo, Partecipazione pagatore)
+	public SpesaPersonale (int idSpesa, float importoTotale,String descrizione, LocalDate data, Gruppo SGruppo, Partecipazione pagatore)
 	{
-		super (importoTotale,descrizione, data, SGruppo, pagatore);
+		super (idSpesa, importoTotale,descrizione, data, SGruppo, pagatore);
 	}
 }

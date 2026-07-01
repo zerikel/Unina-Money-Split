@@ -12,26 +12,28 @@ public class SaldaDebitoDAO {
         List<Quota> lista = new ArrayList<>();
         Connection conn = DBConnection.getConnection();
         
-        String query = "SELECT Q.IDSpesa, Q.Importo, S.Descrizione, S.Data, S.EmailPagatore, U.Nome, U.Cognome " +
-                       "FROM QUOTA Q " +
-                       "JOIN SPESA S ON Q.IDSpesa = S.IDSpesa " +
-                       "JOIN UTENTE U ON S.EmailPagatore = U.Email " +
-                       "WHERE Q.EmailUtente = ? AND S.IDGruppo = ? " +
-                       "AND NOT EXISTS (SELECT 1 FROM MOVIMENTO M WHERE M.IDSpesaQuota = Q.IDSpesa AND M.EmailQuotaUtente = Q.EmailUtente)";
+        String query = "SELECT Q.idspesa, Q.importo, S.descrizione, S.data, S.emailPagatore, U.nome, U.cognome " +
+                "FROM quota Q " +
+                "JOIN spesa S ON Q.idspesa = S.idspesa " +
+                "JOIN utente U ON S.emailpagatore = U.email " +
+                "WHERE Q.emailutente = ? AND S.idgruppo = ? " +
+                "AND S.emailpagatore != ? " + 
+                "AND NOT EXISTS (SELECT 1 FROM movimento M WHERE M.idspesaquota = Q.idspesa AND M.emailquotautente = Q.emailutente)";
         
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, emailDebitore);
             stmt.setInt(2, gruppo.getIdGruppo());
+            stmt.setString(3, emailDebitore);
             ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
-                Utente utenteCreditore = new Utente(rs.getString("EmailPagatore"), "", rs.getString("Cognome"), rs.getString("Nome"));
+                Utente utenteCreditore = new Utente(rs.getString("emailpagatore"), "", rs.getString("cognome"), rs.getString("nome"));
                 Partecipazione pagatore = new Partecipazione(utenteCreditore, gruppo);
-                Spesa spesaRif = new SpesaComune(rs.getFloat("Importo"), rs.getString("Descrizione"), rs.getDate("Data").toLocalDate(), gruppo, pagatore);
+                Spesa spesaRif = new SpesaComune(rs.getInt("idspesa"),rs.getFloat("importo"), rs.getString("descrizione"), rs.getDate("data").toLocalDate(), gruppo, pagatore);
                 
                 Partecipazione debitore = new Partecipazione(new Utente(emailDebitore, "", "", ""), gruppo);
                 
-                lista.add(new Quota(rs.getFloat("Importo"), debitore, spesaRif));
+                lista.add(new Quota(rs.getFloat("importo"), debitore, spesaRif));
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return lista;
@@ -42,40 +44,32 @@ public class SaldaDebitoDAO {
         try {
             conn.setAutoCommit(false);
             
-            String qMov = "INSERT INTO MOVIMENTO (Data, Ora, Commento, Importo, IDSpesaQuota, EmailQuotaUtente) VALUES (?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(qMov)) {
-                stmt.setDate(1, java.sql.Date.valueOf(LocalDate.now()));
-                stmt.setTime(2, java.sql.Time.valueOf(java.time.LocalTime.now()));
-                stmt.setString(3, "Rimborso debito"); 
-                stmt.setFloat(4, importo);
-                stmt.setInt(5, idSpesa); 
-                stmt.setString(6, emailDebitore);
-                stmt.executeUpdate();
-            }
-
-            String qCred = "INSERT INTO STORICOCREDITO (Importo, EmailUtente, IDGruppo) VALUES (?, ?, ?)";
+            String qCred = "INSERT INTO STORICOCREDITO (Importo, EmailUtente, IDGruppo, IdSpesaCredito, EmailDebitore) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(qCred)) {
                 stmt.setFloat(1, importo); 
-                stmt.setString(2, emailDebitore); 
+                stmt.setString(2, emailDebitore);
                 stmt.setInt(3, idGruppo);
+                stmt.setInt(4, idSpesa);
+                stmt.setString(5, emailCreditore); 
                 stmt.executeUpdate();
             }
 
-            String qDeb = "INSERT INTO STORICODEBITO (Importo, EmailUtente, IDGruppo) VALUES (?, ?, ?)";
+      
+            String qDeb = "INSERT INTO STORICODEBITO (Importo, EmailUtente, IDGruppo, IdSpesaDebito, EmailCreditore) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(qDeb)) {
                 stmt.setFloat(1, importo); 
                 stmt.setString(2, emailCreditore); 
                 stmt.setInt(3, idGruppo);
+                stmt.setInt(4, idSpesa);
+                stmt.setString(5, emailDebitore); 
                 stmt.executeUpdate();
             }
 
             conn.commit(); 
             return true;
         } catch (SQLException e) {
-            try { conn.rollback(); } catch (Exception ex) {}
+            e.printStackTrace();
             return false;
-        } finally {
-            try { conn.setAutoCommit(true); } catch (Exception e) {}
         }
     }
 }

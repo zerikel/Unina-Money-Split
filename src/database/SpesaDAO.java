@@ -4,27 +4,25 @@ import Entities.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.Date;
 
 public class SpesaDAO {
 
-    public boolean inserisciSpesa(Spesa spesa) {
+    public boolean inserisciSpesa(float importo, String descrizione, java.sql.Date data,String emailPagatore, int idGruppo,String tipoSpesa) {
         Connection conn = DBConnection.getConnection();
         
         String query = "INSERT INTO SPESA (ImportoTotale, Descrizione, Data, EmailPagatore, IDGruppo, TipoSpesa) VALUES (?, ?, ?, ?, ?, ?)";
         
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setFloat(1, spesa.getImportoTotale());
-            stmt.setString(2, spesa.getDescrizione());
-            stmt.setDate(3, java.sql.Date.valueOf(spesa.getData())); 
+            stmt.setFloat(1, importo);
+            stmt.setString(2, descrizione);
+            stmt.setDate(3, data); 
             
-            stmt.setString(4, spesa.getPagatore().getMyUtente().getEmail()); 
-            stmt.setInt(5, spesa.getSGruppo().getIdGruppo());
+            stmt.setString(4, emailPagatore); 
+            stmt.setInt(5, idGruppo);
             
-            if (spesa instanceof SpesaComune) {
-                stmt.setString(6, "COMUNE");
-            } else {
-                stmt.setString(6, "PERSONALE");
-            }
+            stmt.setString(6, tipoSpesa);
             
             return stmt.executeUpdate() > 0;
             
