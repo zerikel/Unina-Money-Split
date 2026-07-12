@@ -3,6 +3,8 @@ package boundaries;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Color;
+
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -21,15 +23,16 @@ import javafx.scene.Group;
 
 import control.MainController;
 
-public class Report extends JFrame {
+public class Report extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
 
-    public Report() {
+    public Report(JDialog parentFrame) {
+    	super (parentFrame,"Report Statistiche", true);
         setTitle("Report Statistico del Gruppo");
   
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE); 
         setBounds(100, 100, 580, 560); 
         setLocationRelativeTo(null);
         

@@ -9,20 +9,17 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import control.MainController;
-import Entities.Gruppo;
-import Entities.Spesa;
-import Entities.SpesaComune;
-import Entities.Partecipazione;
 
-public class DettagliGruppo extends JFrame {
+public class DettagliGruppo extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;    
     private JTextArea txtSpese;
     private JPanel panelSaldi;
 
-    public DettagliGruppo() {
+    public DettagliGruppo(JFrame parentFrame) {
         
+    	super(parentFrame,"DETTAGLI GRUPPO: "+MainController.getInstance().getNomeGruppoAttuale().toUpperCase(),true);
     	String nomeGruppo = MainController.getInstance().getNomeGruppoAttuale();
         setTitle("DETTAGLI GRUPPO: " + nomeGruppo.toUpperCase());
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
@@ -72,7 +69,7 @@ public class DettagliGruppo extends JFrame {
         btnVediReport.setBounds(380, 280, 160, 40);
         
         btnVediReport.addActionListener(e -> {
-            Report finestraReport = new Report();
+            Report finestraReport = new Report(this);
             finestraReport.setVisible(true);
         });
         
@@ -85,28 +82,33 @@ public class DettagliGruppo extends JFrame {
     }
    
     public void aggiornaDati() {
-        List<Spesa> storico = MainController.getInstance().getSpeseGruppo();
         StringBuilder sb = new StringBuilder();
         sb.append("Data       | Descrizione    | Pagato Da | Importo  | Tipo Spesa\n");
         sb.append("-------------------------------------------------------------------\n");
-        for (Spesa s : storico) {
-            String tipo = (s instanceof SpesaComune) ? "COMUNE" : "PERSONALE";
-            sb.append(String.format("%-10s | %-14s | %-9s | %6.2f € | %s\n", 
-                s.getData().toString(), s.getDescrizione(), 
-                s.getPagatore().getMyUtente().getNome(), s.getImportoTotale(), tipo));
+        
+        List<String[]> datiSpesa = MainController.getInstance().getSpeseGruppoFormattato();
+        
+        for (String[] riga:datiSpesa)
+        {
+        	sb.append(String.format("%-10s | %-14s | %-9s | %6s € | %s\n", riga[0],riga[1],riga[2],riga[3],riga[4]));
         }
+        
         txtSpese.setText(sb.toString());
 
-        List<Partecipazione> saldi = MainController.getInstance().getSaldiGruppo();
         String emailUtenteLoggato = MainController.getInstance().getUtenteLoggato().getEmail();
         
         panelSaldi.removeAll(); 
         
         int yPos = 40;
-        for(Partecipazione p : saldi) {
-            String nomeUtente = p.getMyUtente().getNome() + " " + p.getMyUtente().getCognome();
-            String labelNome = "• " + nomeUtente;
-            labelNome += p.getMyUtente().getEmail().equals(emailUtenteLoggato) ? " (Tu):" : ":";
+        
+        List<String[]> datiSaldi = MainController.getInstance().getSaldiGruppoFormattato();
+        for(String[] dati : datiSaldi) {
+        	
+            String nomeUtente = dati[0] + " " + dati[1];
+            boolean isUtenteLoggato = Boolean.parseBoolean(dati[2]);
+            float saldo = Float.parseFloat(dati[3]);
+            String labelNome = "• " + nomeUtente + (isUtenteLoggato ? "(Tu):" : ":");
+            
             
             JLabel lblNome = new JLabel(labelNome);
             lblNome.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -117,7 +119,6 @@ public class DettagliGruppo extends JFrame {
             lblValore.setFont(new Font("Tahoma", Font.BOLD, 14));
             lblValore.setBounds(250, yPos, 200, 25);
             
-            float saldo = p.calcolaSaldoCorrente();
             if (saldo > 0) {
                 lblValore.setText(String.format("+ %.2f € (Credito)", saldo));
                 lblValore.setForeground(new Color(34, 139, 34));

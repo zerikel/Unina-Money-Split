@@ -27,13 +27,13 @@ public class MainController {
     
     private static MainController instance = null;
     
-    private UtenteDAO utenteDAO;
+    private Gruppo gruppoAttuale;
     private Utente utenteLoggato;
+    private UtenteDAO utenteDAO;
     private GruppoDAO gruppoDAO;
     private InvitoDAO invitoDAO;
     private GruppoDettagliDAO gruppoDettagliDAO;
     private SpesaDAO spesaDAO;
-    private Gruppo gruppoAttuale;
     private SaldaDebitoDAO saldaDebitoDAO;
     
     private MainController() {
@@ -60,8 +60,6 @@ public class MainController {
         
         if (utenteDB != null && utenteDB.getPassword().equals(passwordInserita)) {
             this.utenteLoggato = utenteDB;
-            Dashboard dashboard = new Dashboard();
-            dashboard.setVisible(true); 
             return true;
         }
         return false;
@@ -75,6 +73,20 @@ public class MainController {
     public List<Invito> getInvitiUtente() {
         if (this.utenteLoggato == null) {return new ArrayList<>();}
         return invitoDAO.getInvitiSospesiByUtente(this.utenteLoggato.getEmail());
+    }
+    
+    public List<String[]> getInvitiUtenteFormattati()
+    {
+    	List<Invito> inviti = getInvitiUtente();
+    	List<String[]> risultato = new ArrayList<String[]>();
+    	
+    	for (Invito i: inviti)
+    	{
+    		String id = String.valueOf(i.getInvitoGruppo().getIdGruppo());
+    		String nome = String.valueOf(i.getInvitoGruppo().getNome());
+    		risultato.add(new String[] {id,nome});
+    	}
+    	return risultato;
     }
     
     public boolean gestisciRispostaInvito(int idGruppo, boolean stato) {
@@ -94,14 +106,49 @@ public class MainController {
         }
         return gruppoDettagliDAO.getPartecipazioniByGruppo(this.gruppoAttuale);
     }
-
+    
+    public List<String[]> getSaldiGruppoFormattato() {
+    	List<Partecipazione> saldi = getSaldiGruppo();
+    	List<String[]> risultato = new ArrayList<String[]>();
+    	String emailLoggato = this.getUtenteLoggato().getEmail();
+    	
+    	for (Partecipazione p: saldi)
+    	{
+    		String nome = p.getMyUtente().getNome();
+    		String cognome = p.getMyUtente().getCognome();
+    		String isUtenteLoggato = p.getMyUtente().getEmail().equals(emailLoggato) ? "true" : "false";
+    		String saldo = String.valueOf(p.calcolaSaldoCorrente());
+    		
+    		risultato.add(new String[] {nome,cognome,isUtenteLoggato,saldo});
+    	}
+    	return risultato;
+    }
+    
     public List<Spesa> getSpeseGruppo() {
         if (this.utenteLoggato == null || this.gruppoAttuale == null) { 
             return new ArrayList<>(); 
         }
         return gruppoDettagliDAO.getSpeseByGruppo(this.gruppoAttuale);
     }
-
+    
+    public List<String[]> getSpeseGruppoFormattato()
+    {
+    	List<Spesa> storico = getSpeseGruppo();
+    	List<String[]> risultato = new ArrayList<String[]>();
+    	
+    	for (Spesa s:storico)
+    	{
+    		String data = s.getData().toString();
+    		String desc = s.getDescrizione();
+    		String pagaString = s.getPagatore().getMyUtente().getNome();
+    		String importo = String.format("%.2f", s.getImportoTotale());
+    		String tipo = (s instanceof SpesaComune) ? "COMUNE" : "PERSONALE";
+    		
+    		risultato.add(new String[] {data,desc,pagaString,importo,tipo});
+    	}
+    	return risultato;
+    }
+    
     public boolean registraSpesa(float importo, String descrizione, java.time.LocalDate data, String tipoSpesa) {
         if (this.utenteLoggato == null || this.gruppoAttuale == null) { 
             return false; 
@@ -114,18 +161,6 @@ public class MainController {
         java.sql.Date dataSQL = java.sql.Date.valueOf(data);
         return spesaDAO.inserisciSpesa(importo,descrizione,dataSQL,emailPagatore,idGruppo,tipoSpesa);
     }
-    
-    /*public void impostaGruppoAttuale (int idGruppoSelezionato)
-    {
-    	for (Gruppo g:getGruppiUtente())
-    	{
-    		if (g.getIdGruppo() == idGruppoSelezionato)
-    		{
-    			this.gruppoAttuale = g;
-    			break;
-    		}
-    	}
-    }*/
     
     public String getNomeGruppoAttuale ()
     {

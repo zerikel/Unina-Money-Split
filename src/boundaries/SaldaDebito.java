@@ -27,7 +27,7 @@ public class SaldaDebito extends JDialog {
     private JTextField txtImporto;
     private JComboBox<String> comboQuote;
 
-    public SaldaDebito(JFrame parentFrame) {
+    public SaldaDebito(JDialog parentFrame) {
         super(parentFrame, "Finestra: Registra Rimborso", true); 
         
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -64,6 +64,7 @@ public class SaldaDebito extends JDialog {
         
         txtImporto = new JTextField();
         txtImporto.setBounds(110, 100, 260, 25);
+        txtImporto.setEditable(false);
         contentPane.add(txtImporto);
         txtImporto.setColumns(10);
         
@@ -71,7 +72,6 @@ public class SaldaDebito extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int index = comboQuote.getSelectedIndex();
                 if (index >= 0) {
-    
                     float imp = MainController.getInstance().getImportoQuota(index);
                     txtImporto.setText(String.format("%.2f", imp).replace(",", "."));
                 }
@@ -82,7 +82,6 @@ public class SaldaDebito extends JDialog {
             comboQuote.setSelectedIndex(0);
         } else {
             txtImporto.setText("0.00");
-            txtImporto.setEditable(false);
             comboQuote.addItem("Nessun debito aperto!");
             comboQuote.setEnabled(false);
         }
@@ -107,30 +106,17 @@ public class SaldaDebito extends JDialog {
                     return;
                 }
                 
-                try {
-                    String importoStr = txtImporto.getText().trim().replace(",", ".");
-                    float importoInserito = Float.parseFloat(importoStr);
-   
-                    float importoMax = MainController.getInstance().getImportoQuota(selectedIndex);
-                    
-                    if (importoInserito <= 0 || importoInserito > importoMax) {
-                        JOptionPane.showMessageDialog(SaldaDebito.this, 
-                            "Importo non valido! Massimo consentito: " + importoMax + "€", "Errore", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
 
-     
-                    boolean successo = MainController.getInstance().registraRimborso(selectedIndex, importoInserito);
-                    
-                    if (successo) {
-                        JOptionPane.showMessageDialog(SaldaDebito.this, "Rimborso registrato con successo!");
-                        dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(SaldaDebito.this, "Errore di connessione al database.", "Errore", JOptionPane.ERROR_MESSAGE);
-                    }
-                    
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(SaldaDebito.this, "Inserisci un numero valido!", "Errore Formato", JOptionPane.ERROR_MESSAGE);
+                String importoStr = txtImporto.getText().trim().replace(",", ".");
+                float importoInserito = Float.parseFloat(importoStr);
+
+                boolean successo = MainController.getInstance().registraRimborso(selectedIndex, importoInserito);
+                
+                if (successo) {
+                    JOptionPane.showMessageDialog(SaldaDebito.this, "Rimborso registrato con successo!");
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(SaldaDebito.this, "Errore di connessione al database.", "Errore", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

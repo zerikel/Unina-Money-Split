@@ -18,7 +18,6 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import control.MainController;
-import Entities.Gruppo;
 
 public class AggiungiSpesa extends JDialog {
 
@@ -27,7 +26,7 @@ public class AggiungiSpesa extends JDialog {
     private JTextField txtDescrizione;
     private JTextField txtImporto;
 
-    public AggiungiSpesa(JFrame parentFrame) {
+    public AggiungiSpesa(JDialog parentFrame) {
         super(parentFrame, "Registra Nuova Spesa", true); 
         
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

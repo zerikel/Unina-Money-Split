@@ -3,6 +3,7 @@ package database;
 import Entities.*;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +43,8 @@ public class SaldaDebitoDAO {
     public boolean salvaRimborso(int idSpesa, String emailDebitore, float importo, String emailCreditore, int idGruppo) {
         Connection conn = DBConnection.getConnection();
         try {
-            conn.setAutoCommit(false);
-            
+        	conn.setAutoCommit(false);
+        	
             String qCred = "INSERT INTO STORICOCREDITO (Importo, EmailUtente, IDGruppo, IdSpesaCredito, EmailDebitore) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(qCred)) {
                 stmt.setFloat(1, importo); 
@@ -65,7 +66,19 @@ public class SaldaDebitoDAO {
                 stmt.executeUpdate();
             }
 
-            conn.commit(); 
+            String qMov = "INSERT INTO movimento (data,ora,commento,importo,idspesaquota,emailquotautente) values (?,?,?,?,?,?)";
+            try (PreparedStatement stmt = conn.prepareStatement(qMov))
+            {
+            	stmt.setDate(1, java.sql.Date.valueOf(LocalDate.now()));
+            	stmt.setTime(2, java.sql.Time.valueOf(LocalTime.now()));
+            	stmt.setString(3, "");
+            	stmt.setFloat(4, importo);
+            	stmt.setInt(5, idSpesa);
+            	stmt.setString(6, emailDebitore);
+            	stmt.executeUpdate();
+            }
+            
+            conn.commit();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

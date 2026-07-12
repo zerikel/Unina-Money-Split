@@ -24,8 +24,6 @@ import java.awt.Cursor;
 import java.util.*;
 
 import control.MainController;
-import Entities.Gruppo;
-import Entities.Invito;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -71,7 +69,7 @@ public class Dashboard extends JFrame {
                     if (index >= 0) {
                     	MainController.getInstance().impostaGruppoDaIndice(index);
                     	
-                        DettagliGruppo dettagliFrame = new DettagliGruppo();
+                        DettagliGruppo dettagliFrame = new DettagliGruppo(Dashboard.this);
                         dettagliFrame.setVisible(true);
                     }
                 }
@@ -93,13 +91,13 @@ public class Dashboard extends JFrame {
         contentPane.add(panel);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
-        List<Invito> invitiReali = MainController.getInstance().getInvitiUtente();
+        List<String[]> invitiFormattati = MainController.getInstance().getInvitiUtenteFormattati();
 
         panel.removeAll();
-        for (Invito invito : invitiReali) {
-            String nomeGruppoInvito = invito.getInvitoGruppo().getNome();
+        for (String[] invito : invitiFormattati) {
+            int idGruppo = Integer.parseInt(invito[0]);
+            String nomeGruppoInvito = invito[1];
             String testoInvito = "Invito per: " + nomeGruppoInvito;
-            int idGruppo = invito.getInvitoGruppo().getIdGruppo();
             
             JPanel pannelloSingoloInvito = new JPanel();
             pannelloSingoloInvito.setLayout(new BorderLayout(0, 5));
@@ -146,7 +144,7 @@ public class Dashboard extends JFrame {
         JButton btnCreaGruppo = new JButton("CREA NUOVO GRUPPO");
         btnCreaGruppo.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		CreaNuovoGruppo finestraCrea = new CreaNuovoGruppo();
+        		CreaNuovoGruppo finestraCrea = new CreaNuovoGruppo(Dashboard.this);
         		finestraCrea.setVisible(true);
         	}
         });
@@ -166,8 +164,14 @@ public class Dashboard extends JFrame {
                     javax.swing.JOptionPane.showMessageDialog(Dashboard.this, "Seleziona prima un gruppo dalla lista!");
                     return;
                 }
-        		
-        		AggiungiUtente finestraInvito = new AggiungiUtente();
+        		if (!MainController.getInstance().isCreatoreDelGruppo()) {
+        			javax.swing.JOptionPane.showMessageDialog(Dashboard.this, 
+        					"Accesso Negato: Solo il creatore del gruppo può invitare nuovi partecipanti!", 
+        					"Permessi Insufficienti", 
+        					javax.swing.JOptionPane.ERROR_MESSAGE);
+        			return;
+        		}
+        		AggiungiUtente finestraInvito = new AggiungiUtente(Dashboard.this);
                 finestraInvito.setVisible(true);
         	}
         });

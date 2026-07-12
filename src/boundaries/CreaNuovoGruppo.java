@@ -17,9 +17,10 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-public class CreaNuovoGruppo extends JFrame {
+public class CreaNuovoGruppo extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -28,8 +29,8 @@ public class CreaNuovoGruppo extends JFrame {
 	
 	private List<String> emailInvitati = new ArrayList<>();
 
-	public CreaNuovoGruppo() {
-		
+	public CreaNuovoGruppo(final JFrame parentFrame) {
+		super(parentFrame,"Creazione Gruppo",true);
 		setTitle("Finestra: Crea Nuovo Gruppo");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
 		setBounds(100, 100, 360, 360);
@@ -120,6 +121,10 @@ public class CreaNuovoGruppo extends JFrame {
 				if (successo) {
 					JOptionPane.showMessageDialog(CreaNuovoGruppo.this, "Gruppo creato con successo!");
 					dispose();
+					if (parentFrame != null)
+					{
+						parentFrame.dispose();
+					}
 					new Dashboard().setVisible(true);
 				} else {
 					JOptionPane.showMessageDialog(CreaNuovoGruppo.this, "Creazione fallita! Assicurati che tutti gli invitati siano registrati e che nessuno sia già nel gruppo.", 

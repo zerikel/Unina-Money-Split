@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -19,7 +21,6 @@ import control.MainController;
 import javax.swing.JPasswordField;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import control.MainController;
 public class LoginFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -75,7 +76,17 @@ public class LoginFrame extends JFrame {
 				if (loginSuccesso)
 				{
 					dispose();
+					new Dashboard().setVisible(true);
 ;				}
+				else
+				{
+					JOptionPane.showMessageDialog(
+								LoginFrame.this,
+								"Email o password errati, Riprovare",
+								"ERRORE DI ACCESSO",
+								JOptionPane.ERROR_MESSAGE
+							);
+				}
 			}
 		});
 		btnAccedi.setBorder(new LineBorder(new Color(108, 142, 191), 1, true));

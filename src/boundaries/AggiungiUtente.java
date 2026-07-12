@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ResourceBundle.Control;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,37 +21,14 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-public class AggiungiUtente extends JFrame {
+public class AggiungiUtente extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtInserisciEmail;
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					AggiungiUtente frame = new AggiungiUtente();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	public AggiungiUtente() {
-		
-		if (!control.MainController.getInstance().isCreatoreDelGruppo())
-		{
-			JOptionPane.showMessageDialog(null, 
-					"Accesso Negato: Solo il creatore del gruppo può invitare nuovi partecipanti!", 
-					"Permessi Insufficienti", 
-					JOptionPane.ERROR_MESSAGE);
-			
-			dispose();
-			return;
-		}
+	public AggiungiUtente(JFrame parentFrame) {
+		super (parentFrame,"Aggiungi Utente",true);
 		
 		setTitle("Invita Utenti");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
