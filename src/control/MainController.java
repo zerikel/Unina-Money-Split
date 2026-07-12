@@ -176,6 +176,12 @@ public class MainController {
     		return false;
     	}
     	
+    	if (!isCreatoreDelGruppo())
+    	{
+    		System.out.println("Errore di permessi: L'utente loggato non è il creatore.");
+            return false;
+    	}
+    	
     	int idGruppo = this.gruppoAttuale.getIdGruppo();
     	boolean successo = false;
     	
@@ -325,5 +331,14 @@ public class MainController {
         }
         
         return sb.toString();
+    }
+    
+    public boolean isCreatoreDelGruppo()
+    {
+    	if (this.gruppoAttuale == null || this.utenteLoggato == null)
+    	{
+    		return false;
+    	}
+    	return this.gruppoAttuale.getCreatoreGruppo().getEmail().equals(this.utenteLoggato.getEmail());
     }
 }

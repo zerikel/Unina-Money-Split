@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle.Control;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -39,6 +40,17 @@ public class AggiungiUtente extends JFrame {
 	}
 
 	public AggiungiUtente() {
+		
+		if (!control.MainController.getInstance().isCreatoreDelGruppo())
+		{
+			JOptionPane.showMessageDialog(null, 
+					"Accesso Negato: Solo il creatore del gruppo può invitare nuovi partecipanti!", 
+					"Permessi Insufficienti", 
+					JOptionPane.ERROR_MESSAGE);
+			
+			dispose();
+			return;
+		}
 		
 		setTitle("Invita Utenti");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
