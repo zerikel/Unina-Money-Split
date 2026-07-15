@@ -2,6 +2,7 @@ package boundaries;
 
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.util.List;
 import java.awt.Color;
 
 import javax.swing.JDialog;
@@ -94,8 +95,27 @@ public class Report extends JDialog {
         txtTabella.setForeground(Color.BLACK); 
         txtTabella.setFont(new Font("Monospaced", Font.PLAIN, 13)); 
         txtTabella.setBounds(30, 390, 500, 120);
-        txtTabella.setText(MainController.getInstance().getReportTabellaTesto());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%-15s | %-14s | %s\n", "Partecipante", "Importo Speso", "Saldo Finale Corrente"));
+        sb.append("-----------------------------------------------------------------\n");
         
+        List<String[]> datiTabella = MainController.getInstance().getReportTabellaDati();
+        
+        for (String[] riga : datiTabella) {
+            String nome = riga[0];
+            float speso = Float.parseFloat(riga[1]);
+            float saldo = Float.parseFloat(riga[2]);
+            
+            String saldoStr;
+            if (saldo > 0) saldoStr = String.format("+ %.2f € (Credito)", saldo);
+            else if (saldo < 0) saldoStr = String.format("%.2f € (Debito)", saldo);
+            else saldoStr = "0.00 € (Pari)";
+            
+            sb.append(String.format("%-15s | %6.2f €       | %s\n", nome, speso, saldoStr));
+        }
+        
+        txtTabella.setText(sb.toString());
         contentPane.add(txtTabella);
     }
     

@@ -29,6 +29,7 @@ public class MainController {
     
     private Gruppo gruppoAttuale;
     private Utente utenteLoggato;
+    
     private UtenteDAO utenteDAO;
     private GruppoDAO gruppoDAO;
     private InvitoDAO invitoDAO;
@@ -68,6 +69,25 @@ public class MainController {
     public List<Gruppo> getGruppiUtente() {
         if (this.utenteLoggato == null) {return new ArrayList<>();}
         return gruppoDAO.getGruppiByUtente(this.utenteLoggato.getEmail());
+    }
+    
+    public List<String> getNomiGruppiUtente()
+    {
+    	List<String> nomi= new ArrayList<String>();
+    	for (Gruppo g:getGruppiUtente())
+    	{
+    		nomi.add(g.getNome());
+    	}
+    	return nomi;
+    }
+    
+    public void impostaGruppoDaIndice(int index)
+    {
+    	List<Gruppo> tuttiGruppi = getGruppiUtente();
+    	if (index >= 0 && index < tuttiGruppi.size())
+    	{
+    		this.gruppoAttuale = tuttiGruppi.get(index);
+    	}
     }
     
     public List<Invito> getInvitiUtente() {
@@ -243,25 +263,6 @@ public class MainController {
     	return successo;
     }
     
-    public List<String> getNomiGruppiUtente()
-    {
-    	List<String> nomi= new ArrayList<String>();
-    	for (Gruppo g:getGruppiUtente())
-    	{
-    		nomi.add(g.getNome());
-    	}
-    	return nomi;
-    }
-    
-    public void impostaGruppoDaIndice(int index)
-    {
-    	List<Gruppo> tuttiGruppi = getGruppiUtente();
-    	if (index >= 0 && index < tuttiGruppi.size())
-    	{
-    		this.gruppoAttuale = tuttiGruppi.get(index);
-    	}
-    }
-    
     public List<String> getQuoteAperteTesto() {
         List<Quota> quote = saldaDebitoDAO.getQuoteAperte(this.utenteLoggato.getEmail(), this.gruppoAttuale);
         List<String> testiUI = new ArrayList<>();
@@ -305,7 +306,7 @@ public class MainController {
     }
 
     public float getReportImportoTotale() {
-        if (this.gruppoAttuale == null) return 0f;
+        if (this.gruppoAttuale == null) return 0;
         List<Spesa> spese = gruppoDettagliDAO.getSpeseByGruppo(this.gruppoAttuale);
         float totale = 0;
         for (Spesa s : spese) {
@@ -335,15 +336,13 @@ public class MainController {
         return new double[]{percComuni, percPersonali};
     }
 
-    public String getReportTabellaTesto() {
-        if (this.gruppoAttuale == null) return "";
+    public List<String[]> getReportTabellaDati() {
+        if (this.gruppoAttuale == null) return new ArrayList<>();
         
         List<Partecipazione> saldi = gruppoDettagliDAO.getPartecipazioniByGruppo(this.gruppoAttuale);
         List<Spesa> spese = gruppoDettagliDAO.getSpeseByGruppo(this.gruppoAttuale);
         
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%-15s | %-14s | %s\n", "Partecipante", "Importo Speso", "Saldo Finale Corrente"));
-        sb.append("-----------------------------------------------------------------\n");
+        List<String[]> risultato = new ArrayList<>();
         
         for (Partecipazione p : saldi) {
             String nome = p.getMyUtente().getNome();
@@ -357,15 +356,15 @@ public class MainController {
             }
             
             float saldo = p.calcolaSaldoCorrente();
-            String saldoStr;
-            if (saldo > 0) saldoStr = String.format("+ %.2f € (Credito)", saldo);
-            else if (saldo < 0) saldoStr = String.format("%.2f € (Debito)", saldo);
-            else saldoStr = "0.00 € (Pari)";
             
-            sb.append(String.format("%-15s | %6.2f €       | %s\n", nome, speso, saldoStr));
+            risultato.add(new String[] {
+                nome,
+                String.valueOf(speso),
+                String.valueOf(saldo)
+            });
         }
         
-        return sb.toString();
+        return risultato;
     }
     
     public boolean isCreatoreDelGruppo()

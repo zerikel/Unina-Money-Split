@@ -81,7 +81,7 @@ public class AggiungiUtente extends JDialog {
 				if (email.isEmpty() || email.equals("Inserisci un'email per aggiungere...")) {
 					JOptionPane.showMessageDialog(
 						AggiungiUtente.this, 
-						"Il campo email è vuoto!", 
+						"Il campo email Ã¨ vuoto!", 
 						"Attenzione", 
 						JOptionPane.WARNING_MESSAGE
 					);

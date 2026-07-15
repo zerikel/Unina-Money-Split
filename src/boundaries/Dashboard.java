@@ -166,7 +166,7 @@ public class Dashboard extends JFrame {
                 }
         		if (!MainController.getInstance().isCreatoreDelGruppo()) {
         			javax.swing.JOptionPane.showMessageDialog(Dashboard.this, 
-        					"Accesso Negato: Solo il creatore del gruppo può invitare nuovi partecipanti!", 
+        					"Accesso Negato: Solo il creatore del gruppo puÃ² invitare nuovi partecipanti!", 
         					"Permessi Insufficienti", 
         					javax.swing.JOptionPane.ERROR_MESSAGE);
         			return;
