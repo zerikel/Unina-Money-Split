@@ -148,6 +148,6 @@ public class AggiungiSpesa extends JDialog {
         });
         
         contentPane.add(btnSalvaSpesa);
-        //Prova
+        //Provas
     }
 }
