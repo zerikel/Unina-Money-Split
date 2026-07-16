@@ -3,6 +3,7 @@ package Entities;
 public class StoricoCredito {
 	
 	private float importo;
+	private Quota quotaStoricoCredito;
 	
 	public float getImporto() {
 		return importo;
@@ -12,8 +13,9 @@ public class StoricoCredito {
 		this.importo = importo;
 	}
 
-	public StoricoCredito(float importo) {
+	public StoricoCredito(float importo,Quota quota) {
 		this.importo = importo;
+		this.quotaStoricoCredito = quota;
 	}
 
 }

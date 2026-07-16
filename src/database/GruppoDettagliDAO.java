@@ -82,8 +82,8 @@ public class GruppoDettagliDAO {
                     );
                     
                     Partecipazione p = new Partecipazione(utente, gruppo);
-                    caricaStoricoCrediti(p, gruppo.getIdGruppo(), conn);
-                    caricaStoricoDebiti(p, gruppo.getIdGruppo(), conn);
+                    caricaStoricoCrediti(p, gruppo, conn);
+                    caricaStoricoDebiti(p, gruppo, conn);
                     
                     partecipazioni.add(p);
                 }
@@ -95,14 +95,32 @@ public class GruppoDettagliDAO {
         return partecipazioni;
     }
 
-    private void caricaStoricoCrediti(Partecipazione p, int idGruppo, Connection conn) {
-        String query = "SELECT Importo FROM STORICOCREDITO WHERE EmailUtente = ? AND IDGruppo = ?";
+    private void caricaStoricoCrediti(Partecipazione p, Gruppo gruppo, Connection conn) {
+    	String query = "SELECT SC.Importo AS ImportoCredito, SC.IdSpesaCredito, SC.EmailDebitore, " +
+                "Q.Importo AS ImportoQuota, " +
+                "S.Descrizione, S.Data, S.ImportoTotale, S.EmailPagatore, U.Nome, U.Cognome " +
+                "FROM STORICOCREDITO SC " +
+                "JOIN QUOTA Q ON SC.IdSpesaCredito = Q.idspesa AND SC.EmailDebitore = Q.emailutente " +
+                "JOIN SPESA S ON Q.idspesa = S.idspesa " +
+                "JOIN UTENTE U ON S.EmailPagatore = U.email " +
+                "WHERE SC.EmailUtente = ? AND SC.IDGruppo = ?";
+    	
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, p.getMyUtente().getEmail());
-            stmt.setInt(2, idGruppo);
+            stmt.setInt(2, gruppo.getIdGruppo());
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    p.addCredito(new StoricoCredito(rs.getFloat("Importo")));
+                	Utente utentePagatore = new Utente(rs.getString("EmailPagatore"), "", rs.getString("Cognome"), rs.getString("Nome"));
+                    Partecipazione pagatore = new Partecipazione(utentePagatore, gruppo);
+                    Spesa spesaRif = new SpesaComune(rs.getInt("IdSpesaCredito"), rs.getFloat("ImportoTotale"), rs.getString("Descrizione"), rs.getDate("Data").toLocalDate(), gruppo, pagatore);
+                    
+                    Utente utenteDebitore = new Utente(rs.getString("EmailDebitore"), "", "", "");
+                    Partecipazione debitore = new Partecipazione(utenteDebitore, gruppo);
+                    
+                    Quota quota = new Quota(rs.getFloat("ImportoQuota"), debitore, spesaRif);
+                    
+                    p.addCredito(new StoricoCredito(rs.getFloat("ImportoCredito"), quota));
                 }
             }
         } catch (SQLException e) {
@@ -110,14 +128,34 @@ public class GruppoDettagliDAO {
         }
     }
 
-    private void caricaStoricoDebiti(Partecipazione p, int idGruppo, Connection conn) {
-        String query = "SELECT Importo FROM STORICODEBITO WHERE EmailUtente = ? AND IDGruppo = ?";
+    private void caricaStoricoDebiti(Partecipazione p, Gruppo gruppo, Connection conn) {
+    	String query = "SELECT SD.Importo AS ImportoDebito, SD.IdSpesaDebito, SD.EmailCreditore, " +
+                "Q.Importo AS ImportoQuota, " +
+                "S.Descrizione, S.Data, S.ImportoTotale, S.EmailPagatore, U.Nome, U.Cognome " +
+                "FROM STORICODEBITO SD " +
+                "JOIN QUOTA Q ON SD.IdSpesaDebito = Q.idspesa AND SD.EmailUtente = Q.emailutente " +
+                "JOIN SPESA S ON Q.idspesa = S.idspesa " +
+                "JOIN UTENTE U ON S.EmailPagatore = U.email " +
+                "WHERE SD.EmailUtente = ? AND SD.IDGruppo = ?";
+    	
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, p.getMyUtente().getEmail());
-            stmt.setInt(2, idGruppo);
+            stmt.setInt(2, gruppo.getIdGruppo());
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    p.addDebito(new StoricoDebito(rs.getFloat("Importo")));
+                	
+                	Utente utentePagatore = new Utente(rs.getString("EmailPagatore"), "", rs.getString("Cognome"), rs.getString("Nome"));
+                    Partecipazione pagatore = new Partecipazione(utentePagatore, gruppo);
+                    Spesa spesaRif = new SpesaComune(rs.getInt("IdSpesaDebito"), rs.getFloat("ImportoTotale"), rs.getString("Descrizione"), rs.getDate("Data").toLocalDate(), gruppo, pagatore);
+                    
+                    Partecipazione debitore = p;
+                    
+                    Quota quota = new Quota(rs.getFloat("ImportoQuota"), debitore, spesaRif);
+                    
+                    StoricoDebito sd = new StoricoDebito(rs.getFloat("ImportoDebito"));
+                    sd.setImporto(rs.getFloat("ImportoDebito"), quota);
+                    p.addDebito(sd);
                 }
             }
         } catch (SQLException e) {
