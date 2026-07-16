@@ -153,8 +153,7 @@ public class GruppoDettagliDAO {
                     
                     Quota quota = new Quota(rs.getFloat("ImportoQuota"), debitore, spesaRif);
                     
-                    StoricoDebito sd = new StoricoDebito(rs.getFloat("ImportoDebito"));
-                    sd.setImporto(rs.getFloat("ImportoDebito"), quota);
+                    StoricoDebito sd = new StoricoDebito(rs.getFloat("ImportoDebito"),quota);
                     p.addDebito(sd);
                 }
             }
